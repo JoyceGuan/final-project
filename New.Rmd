@@ -1,0 +1,133 @@
+---
+title: "new"
+author: "Meirou Guan"
+date: "12/18/2020"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+ load("~/Desktop/ecob2000_lecture1/Meirou.Genderwage_a.RData")
+```
+
+```{r}
+summary(newdata)
+```
+```{r}
+attach(newdata)
+use_var<-(YEAR=2019)&(AGE>=25)&(AGE<=65)
+dat_use1<-subset(newdata,use_var)
+```
+
+```{r}
+part_time <- as.numeric(dat_use1$UHRSWORK<35)
+part_time<-is.na(part_time)
+ part_time<-as.factor(part_time)
+
+full_time <-as.numeric(dat_use1$UHRSWORK<=35)&(dat_use1$UHRSWORK<50)
+full_time<-as.factor(full_time)
+
+long_time<-as.numeric(dat_use1$UHRSWORK<=50)
+long_time<-as.factor(long_time)
+```
+
+```{r}
+Model1_ft<-glm(full_time~AGE + I(AGE^2) +SEX+NFAMS+NCHLT5+NCHILD+HISPAN+RACAMIND+RACASIAN+RACBLK+RACOTHER+RACWHT+educ_nohs+educ_hs+educ_smcoll+educ_bach+educ_as+educ_adv+MARST,family = binomial,(data=dat_use1))
+summary(Model1_ft)
+```
+```{r}
+Model2_pt<-glm(part_time~AGE + I(AGE^2) +SEX+NFAMS+NCHLT5+NCHILD+HISPAN+RACAMIND+RACASIAN+RACBLK+RACOTHER+RACWHT+educ_nohs+educ_hs+educ_smcoll+educ_bach+educ_as+educ_adv+MARST,family = binomial,(data=dat_use1))
+summary(Model2_pt)
+```
+```{r}
+Model3_lt<-glm(long_time~AGE + I(AGE^2) +SEX+NFAMS+NCHLT5+NCHILD+HISPAN+RACAMIND+RACASIAN+RACBLK+RACOTHER+RACWHT+educ_nohs+educ_hs+educ_smcoll+educ_bach+educ_as+educ_adv+MARST,family = binomial,(data=dat_use1))
+summary(Model3_lt)
+```
+```{r}
+require(stargazer)
+stargazer(Model2_pt, Model1_ft, Model3_lt,type="text")
+```
+```{r}
+Model4_pt<-glm(part_time~AGE + I(AGE^2) +SEX+female*NFAMS+female*NCHLT5+NCHILD*female+MARST:female,family = binomial,(data=dat_use1))
+summary(Model4_pt)
+```
+```{r}
+exp<-(Model4_pt$coefficients)
+
+```
+
+
+
+
+# OLS 2016&2019 regression with domographic factors and household factors 
+```{r}
+model5<-lm(log1p(INCWAGE)~AGE + I(AGE^2) +SEX+female*HISPAN+female*RACAMIND+female*RACASIAN+female*RACBLK+female*RACOTHER+female*RACWHT, data=dat_use1)
+summary(model5)
+```
+
+#OLS REGRESSION WITH SOME INTERACTIONS WITH FEMALE
+```{r}
+model6<-lm(log1p(INCWAGE)~AGE + I(AGE^2) +SEX+NFAMS+female*NCHLT5+female*NCHILD+female*HISPAN+female*RACAMIND+female*RACASIAN+female*RACBLK+female*RACOTHER+female*RACWHT+female*educ_nohs+female*educ_hs+female*educ_smcoll+female*educ_bach+female*educ_as+female*educ_adv+female*MARST+female*UHRSWORK, data=dat_use1)
+summary(model6)
+```
+
+
+
+```{r}
+computer_Inf_service<-(DEGFIELD==21)
+computer_Inf_service<-as.factor(computer_Inf_service)
+construction_service<-(DEGFIELD==56)
+ construction_service<-as.factor(construction_service)
+ educ_admin_teaching<-(DEGFIELD==31)
+ educ_admin_teaching<-as.factor(educ_admin_teaching)
+ medical_health_scie<-(DEGFIELD==61)
+ medical_health_scie<-as.factor(medical_health_scie)
+ 
+
+```
+
+
+
+```{r}
+newdata2<-cbind.data.frame(newdata,computer_Inf_service,construction_service,educ_admin_teaching,medical_health_scie)
+
+```
+
+```{r}
+model7<-lm(log1p(INCWAGE)~female)
+summary(model7)
+```
+
+```{r}
+model8<-lm(log1p(INCWAGE)~female+female*RACAMIND+female*RACASIAN+female*RACBLK+female*RACOTHER+female*RACWHT)
+summary(model8)
+```
+```{r}
+NNobs<-length(newdata$LABFORCE)
+set.seed(12345)
+graph_obs<-(runif(NNobs)<0.5)
+dat_graph<-subset(newdata,graph_obs)
+plot(SEX~DEGFIELD,pch=10,ylim=c(0,1),data=dat_graph,main="SEX", xlab="DEGFIELD",ylab = "SEX",col=c("blue","gray"))
+```
+
+```{r}
+NNobs<-length(newdata$SEX)
+set.seed(12345)
+graph_obs<-(runif(NNobs)<0.5)
+dat_graph<-subset(newdata,graph_obs)
+plot(SEX~EDUC,pch=10,ylim=c(0,1),data=dat_graph,main="SEX", xlab="EDUC",ylab = "SEX",col=c("blue","gray"))
+```
+
+```{r}
+
+```
+
+```
+
+
+```
+
+
